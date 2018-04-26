@@ -32,7 +32,7 @@ class WifiConnectionsList:
 
             # Create a WifiConnection object for each wifi profile in the list
             for i in range(0, len(profile_names_list)):
-                self.connections_list[i] = wifi_connection.WifiConnection(profile_names_list[i] - 1)
+                self.connections_list.append(wifi_connection.WifiConnection(profile_names_list[i]))
 
     def update_connections_list(self):
         # Get current list of profile names
