@@ -3,10 +3,15 @@ import subprocess
 
 class WifiConnection:
 
-    def __init__(self, connection_name):
-        self.connection_name = connection_name
-        self.connection_priority = ""
-        self.auto_connect = False
+    def __init__(self, connection_name, priority=None, auto_connect=None):
+        if priority is None and auto_connect is None:
+            self.connection_name = connection_name
+            self.connection_priority = ""
+            self.auto_connect = False
+        else:
+            self.connection_name = connection_name
+            self.connection_priority = priority
+            self.auto_connect = auto_connect
 
     def set_priority(self, connection_priority):
         self.connection_priority = connection_priority

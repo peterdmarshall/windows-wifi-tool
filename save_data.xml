@@ -1,0 +1,10 @@
+<wifi_tools_save_data>
+    <connections_count>1</connections_count>
+    <connections_list>
+        <connection>
+            ConnectionName
+            <priority>2</priority>
+            <autoconnect>False</autoconnect>
+        </connection>
+    </connections_list>
+</wifi_tools_save_data>

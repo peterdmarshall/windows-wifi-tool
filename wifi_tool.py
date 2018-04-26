@@ -1,6 +1,7 @@
 from tkinter import Tk, Label, Button, Entry, IntVar, END, W, E
 import subprocess, re
 import wifi_connection, wifi_connections_list
+from pathlib import Path
 
 
 class WifiTool:
@@ -10,8 +11,11 @@ class WifiTool:
         master.title = WifiTool
         master.resizable(width=False, height=False)
 
-        # List of WifiConnection objects
-        self.wifi_connections_list = wifi_connections_list.WifiConnectionsList()
+        # Create or load list of WifiConnection objects
+        if Path("save_data.xml").is_file():
+            self.wifi_connections_list = wifi_connections_list.WifiConnectionsList("save_data.xml")
+        else:
+            self.wifi_connections_list = wifi_connections_list.WifiConnectionsList()
 
 
 if __name__ == "__main__":

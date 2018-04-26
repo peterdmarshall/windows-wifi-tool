@@ -1,12 +1,29 @@
 import wifi_connection
 import subprocess, re
-from xml.etree.ElementTree import Element, ElementTree, SubElement, Comment, tostring
+import xml.etree.ElementTree as Et
+from xml.etree.ElementTree import Element, SubElement, ElementTree
 
 
 class WifiConnectionsList:
 
     def __init__(self, save_data=None):
-        if save_data is None:
+
+        if save_data is not None:
+            try:
+                self.connections_list = []
+                self.load_save_data(save_data)
+            except Et.ParseError:
+                # Create connections list
+                self.connections_list = []
+
+                # Get current list of profile names
+                profile_names_list = self.get_profile_names_list()
+
+                # Create a WifiConnection object for each wifi profile in the list
+                for i in range(0, len(profile_names_list) - 1):
+                    self.connections_list[i] = wifi_connection.WifiConnection(profile_names_list[i])
+
+        else:
             # Create connections list
             self.connections_list = []
 
@@ -15,12 +32,7 @@ class WifiConnectionsList:
 
             # Create a WifiConnection object for each wifi profile in the list
             for i in range(0, len(profile_names_list)):
-                self.connections_list[i] = wifi_connection.WifiConnection(profile_names_list[i])
-
-        else:
-            self.connections_list = []
-            self.load_save_data()
-
+                self.connections_list[i] = wifi_connection.WifiConnection(profile_names_list[i] - 1)
 
     def update_connections_list(self):
         # Get current list of profile names
@@ -51,19 +63,23 @@ class WifiConnectionsList:
 
         return profile_names_list
 
-    def load_save_data(self):
-        tree = ElementTree.parse('save_data.xml')
+    def load_save_data(self, save_data):
+        tree = Et.parse(save_data)
         wifi_connections_file = tree.getroot()
-
+        connections_count = int(wifi_connections_file.find('connections_count').text)
+        all_connections = wifi_connections_file.findall('connection')
+        for i in range(0, connections_count - 1):
+            self.connections_list = wifi_connection.WifiConnection(all_connections[i].text,
+                                                                   all_connections[i].get('priority').text,
+                                                                   all_connections[i].get('auto_connect').text)
 
     def create_save_data(self):
         # Create XML file to store data for
-        wifi_connections_file = Element('WiFi Tools Save Data')
+        wifi_connections_file = Element('wifi_tools_save_data')
         wifi_connections_file.set('version', '1.0')
+        SubElement(wifi_connections_file, 'connections_count').text(Et.tostring(len(self.connections_list)))
 
         wifi_connections = SubElement(wifi_connections_file, 'connections_list')
-
-        SubElement(wifi_connections, 'connections_count').text(tostring(len(self.connections_list)))
         for i in self.connections_list:
             connection = SubElement(wifi_connections, 'connection').text(i.connection_name)
             SubElement(connection, 'priority').text(i.connection_priority)
